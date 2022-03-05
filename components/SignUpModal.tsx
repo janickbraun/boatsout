@@ -4,6 +4,8 @@ import Box from "@mui/material/Box"
 import Modal from "@mui/material/Modal"
 import Fade from "@mui/material/Fade"
 import Button from "@mui/material/Button"
+import { TextField } from "@mui/material"
+import axios from "axios"
 
 const style = {
   position: "absolute",
@@ -17,10 +19,36 @@ const style = {
   p: 4,
 }
 
+type Input = {
+  email: string
+  password: string
+}
+
 export default function TransitionsModal() {
   const [open, setOpen] = useState(false)
+  const [input, setInput] = useState<Input>({
+    email: "",
+    password: "",
+  })
+  const handleChange = (event: React.ChangeEvent<any>) => {
+    const value = event.target.value
+    setInput({
+      ...input,
+      [event.target.name]: value,
+    })
+  }
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
+
+  const handleSignUp = () => {
+    axios.post("/api/auth/signup", { email: input.email, password: input.password }).then((res) => {
+      if (res.data.status === "ok") {
+        localStorage.setItem("token", res.data.token)
+        console.log(res.data.msg)
+      }
+    })
+    handleClose()
+  }
 
   return (
     <div>
@@ -38,7 +66,11 @@ export default function TransitionsModal() {
       >
         <Fade in={open}>
           <Box sx={style}>
-            <input type="text" placeholder="Email" />
+            <TextField label="Email" variant="outlined" type={"email"} name="email" onChange={(e) => handleChange(e)} />
+            <TextField label="Password" variant="outlined" type="password" name="password" onChange={(e) => handleChange(e)} />
+            <Button variant="contained" onClick={handleSignUp}>
+              Sign up
+            </Button>
           </Box>
         </Fade>
       </Modal>

@@ -1,4 +1,4 @@
-import React, { useState, SyntheticEvent } from "react"
+import React, { useState } from "react"
 import Backdrop from "@mui/material/Backdrop"
 import Box from "@mui/material/Box"
 import Modal from "@mui/material/Modal"
@@ -43,8 +43,11 @@ export default function TransitionsModal() {
   const handleClose = () => setOpen(false)
 
   const handleLogin = () => {
-    axios.post("/api/account/login", { email: input.email, password: input.password }).then((res) => {
-      console.log(res.data.user)
+    axios.post("/api/auth/login", { email: input.email, password: input.password }).then((res) => {
+      if (res.data.status === "ok") {
+        localStorage.setItem("token", res.data.token)
+        console.log(res.data.msg)
+      }
     })
     handleClose()
   }
